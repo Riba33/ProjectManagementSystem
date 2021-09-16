@@ -136,7 +136,7 @@ public class QueryRepositoryImpl implements QueryRepository {
             }
             i = sc.nextLong();
         } while (!isGood(i,list.size()));
-
+        sc.close();
         return i;
 
     }

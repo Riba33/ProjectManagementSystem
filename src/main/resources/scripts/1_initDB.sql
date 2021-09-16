@@ -38,27 +38,43 @@ CREATE TABLE IF NOT EXISTS companies (
 CREATE TABLE IF NOT EXISTS developers_projects (
   developers_id INT NOT NULL,
   projects_id INT NOT NULL,
-  FOREIGN KEY (developers_id) REFERENCES developers (id),
+  FOREIGN KEY (developers_id) REFERENCES developers (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE,
   FOREIGN KEY (projects_id) REFERENCES projects (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE
 );
   
 CREATE TABLE IF NOT EXISTS customers_projects (
   projects_id INT NOT NULL,
   customers_id INT NOT NULL,
-  FOREIGN KEY (projects_id) REFERENCES projects (id),
+  FOREIGN KEY (projects_id) REFERENCES projects (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE,
   FOREIGN KEY (customers_id) REFERENCES customers (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE
  );
   
 CREATE TABLE IF NOT EXISTS companies_projects (
   projects_id INT NOT NULL,
   companies_id INT NOT NULL,
-  FOREIGN KEY (projects_id) REFERENCES projects (id),
+  FOREIGN KEY (projects_id) REFERENCES projects (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE,
   FOREIGN KEY (companies_id) REFERENCES companies (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE
 );
   
 CREATE TABLE IF NOT EXISTS developers_skils (
   developers_id INT NOT NULL,
   skils_id INT NOT NULL,
-  FOREIGN KEY (developers_id) REFERENCES developers (id),
+  FOREIGN KEY (developers_id) REFERENCES developers (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE,
   FOREIGN KEY (skils_id) REFERENCES skils (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE
 );

@@ -28,6 +28,7 @@ class CrudRepositoryImpl<T extends BaseEntity<ID>, ID> implements Closeable, Cru
     private final Class<T> modelClass;
     private final Map<String, String> columnFieldName;
     private final String databaseSchemaName;
+    private final String generatedColumns[];
 
     private final PreparedStatement findAllPreparedStatement;
     private final PreparedStatement findByIDPreparedStatement;
@@ -52,7 +53,7 @@ class CrudRepositoryImpl<T extends BaseEntity<ID>, ID> implements Closeable, Cru
                 .filter(field -> !Modifier.isStatic(field.getModifiers()))
                 .filter(field -> field.getAnnotation(Id.class) != null)
                 .findAny().orElseThrow(() -> new RuntimeException("Entity must contais ID")))};
-
+        this.generatedColumns = generatedColumns;
         String tableName = modelClass.getAnnotation(Entity.class) != null
                 ? modelClass.getAnnotation(Entity.class).name() : modelClass.getSimpleName().toLowerCase();
 
