@@ -1,4 +1,4 @@
-package service;
+package contoller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -43,6 +43,7 @@ public class Console <T extends BaseEntity<ID>, ID>{
             }
             i = sc.nextInt();
         }
+
         while (!selectIsGood(i));
         switchSelected(i);
 
@@ -58,7 +59,7 @@ public class Console <T extends BaseEntity<ID>, ID>{
     private void switchSelected(int i){
         switch (i) {
             case 1:
-                System.out.println(gson.toJson(repo.getSumByProID(repo.selectProject())));
+                System.out.println(repo.getSumByProID(repo.selectProject()));
                 exitOrNot();
                 break;
             case 2:
@@ -98,7 +99,6 @@ public class Console <T extends BaseEntity<ID>, ID>{
             i = sc.nextInt();
         }
         while (!isOneOrZero(i));
-
         switch (i){
             case 1: Console.getInstance().selectMenu();
             default: break;
@@ -111,4 +111,5 @@ public class Console <T extends BaseEntity<ID>, ID>{
         }
         return true;
     }
+
 }

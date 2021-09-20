@@ -1,9 +1,11 @@
-package service;
+package contoller;
 
 import lombok.SneakyThrows;
 import model.*;
 import repository.CrudRepository;
 import repository.RepositoryFactory;
+import service.*;
+
 import java.util.Scanner;
 
 public class CrudService <T extends BaseEntity<ID>, ID>{

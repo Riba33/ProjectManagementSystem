@@ -33,14 +33,14 @@ public class QueryRepositoryImpl implements QueryRepository {
     @Override
     public Long getSumByProID(Long projectId) throws SQLException {
 
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT sum(salary) as cost,\n" +
-                "\tprojects.name as projectName\n" +
-                "\tFROM developers\n" +
-                "\tINNER JOIN developers_projects\n" +
-                "\tON developers.id = developers_projects.developers_id\n" +
-                "\tINNER JOIN projects \n" +
-                "\tON developers_projects.projects_id = projects.id\n" +
-                "   \tWHERE projects.name='" + findProById(projectId) +"';");
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT sum(salary) as cost, " +
+                " projects.name as projectName " +
+                " FROM developers " +
+                " INNER JOIN developers_projects " +
+                " ON developers.id = developers_projects.developers_id " +
+                " INNER JOIN projects " +
+                " ON developers_projects.projects_id = projects.id " +
+                "   WHERE projects.id='" + projectId +"';");
         ResultSet resultSet = preparedStatement.executeQuery();
         List<Long> cost = new ArrayList<>();
         while (resultSet.next()){
@@ -52,53 +52,53 @@ public class QueryRepositoryImpl implements QueryRepository {
     @Override
     public List getDevsByProID(Long projectId) throws SQLException {
 
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * \n" +
-                "FROM developers\n" +
-                "\tINNER JOIN developers_projects\n" +
-                "\tON developers.id = developers_projects.developers_id\n" +
-                "\tINNER JOIN projects \n" +
-                "\tON developers_projects.projects_id = projects.id\n" +
-                "    WHERE projects.name = '" + findProById(projectId) +"';");
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * " +
+                "FROM developers " +
+                " INNER JOIN developers_projects " +
+                " ON developers.id = developers_projects.developers_id " +
+                " INNER JOIN projects " +
+                " ON developers_projects.projects_id = projects.id " +
+                "    WHERE projects.id = '" + projectId +"';");
 
-        return parseDeveloppers(preparedStatement.executeQuery());
+        return parseDevelopers(preparedStatement.executeQuery());
     }
 
     @Override
     public List listJava() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT developers.id, developers.name, " +
-                "developers.surname, developers.age, developers.gender, developers.salary \n" +
-                "FROM developers\n" +
-                "\tINNER JOIN developers_skils\n" +
-                "\tON developers.id = developers_skils.developers_id\n" +
-                "\tINNER JOIN skils \n" +
-                "\tON developers_skils.skils_id = skils.id\n" +
-                "\tWHERE skils.name='Java';");
-        return parseDeveloppers(preparedStatement.executeQuery());
+                "developers.surname, developers.age, developers.gender, developers.salary " +
+                "FROM developers " +
+                " INNER JOIN developers_skils " +
+                " ON developers.id = developers_skils.developers_id " +
+                " INNER JOIN skils " +
+                " ON developers_skils.skils_id = skils.id " +
+                " WHERE skils.name='Java';");
+        return parseDevelopers(preparedStatement.executeQuery());
     }
 
     @Override
     public List listMiddle() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT developers.id, developers.name, developers.surname,\n" +
-                "\tdevelopers.age, developers.gender, developers.salary \n" +
-                "FROM developers\n" +
-                "\tINNER JOIN developers_skils\n" +
-                "\tON developers.id = developers_skils.developers_id\n" +
-                "\tINNER JOIN skils \n" +
-                "\tON developers_skils.skils_id = skils.id\n" +
-                "   \tWHERE skils.level='Middle'\n" +
+                " developers.age, developers.gender, developers.salary " +
+                "FROM developers " +
+                " INNER JOIN developers_skils " +
+                " ON developers.id = developers_skils.developers_id " +
+                " INNER JOIN skils " +
+                " ON developers_skils.skils_id = skils.id " +
+                "   WHERE skils.level='Middle' " +
                 "    ORDER BY id;");
-        return parseDeveloppers(preparedStatement.executeQuery());
+        return parseDevelopers(preparedStatement.executeQuery());
     }
 
     @Override
     public List<DevelopersInProject> listProWithData() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT projects.name, projects.date," +
-                " count(projects.name) Developers\n" +
-                "FROM projects\n" +
-                "\tINNER JOIN developers_projects\n" +
-                "\tON projects.id = developers_projects.projects_id\n" +
-                "\tINNER JOIN developers \n" +
-                "\tON developers_projects.developers_id = developers.id\n" +
+                " count(projects.name) Developers " +
+                "FROM projects " +
+                " INNER JOIN developers_projects " +
+                " ON projects.id = developers_projects.projects_id " +
+                " INNER JOIN developers " +
+                " ON developers_projects.developers_id = developers.id " +
                 "GROUP BY name;");
         final ResultSet resultSet = preparedStatement.executeQuery();
         List<DevelopersInProject> list = new ArrayList<>();
@@ -114,7 +114,7 @@ public class QueryRepositoryImpl implements QueryRepository {
         return list;
     }
     public Long selectProject() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM mydb.projects;");
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM projects;");
         final ResultSet resultSet = preparedStatement.executeQuery();
         List<Project> list = new ArrayList<>();
         while(resultSet.next()) {
@@ -136,11 +136,10 @@ public class QueryRepositoryImpl implements QueryRepository {
             }
             i = sc.nextLong();
         } while (!isGood(i,list.size()));
-        sc.close();
         return i;
 
     }
-    private List<Developer> parseDeveloppers(ResultSet resultSet) throws SQLException {
+    private List<Developer> parseDevelopers(ResultSet resultSet) throws SQLException {
         List<Developer> developers = new ArrayList<>();
         while(resultSet.next()) {
             Developer developer = Developer.builder()
@@ -155,11 +154,7 @@ public class QueryRepositoryImpl implements QueryRepository {
         }
         return developers;
     }
-    private String findProById(Long projectId) {
-        CrudRepository<Project, Long> projectRepository = RepositoryFactory.of(Project.class);
-        Optional<Project> project = projectRepository.findById(projectId);
-        return project.get().getName();
-    }
+
     private boolean isGood(Long i, int size) {
         if (i > 0 && i <= size) return true;
         return false;
