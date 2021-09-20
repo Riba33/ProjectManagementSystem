@@ -79,7 +79,7 @@ public class Console <T extends BaseEntity<ID>, ID>{
                 exitOrNot();
                 break;
             case 6:
-                CrudService.getInstance().selectModel();
+                CrudController.getInstance().selectModel();
                 exitOrNot();
                 break;
             default:

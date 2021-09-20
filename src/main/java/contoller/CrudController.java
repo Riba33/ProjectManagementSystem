@@ -8,13 +8,13 @@ import service.*;
 
 import java.util.Scanner;
 
-public class CrudService <T extends BaseEntity<ID>, ID>{
+public class CrudController<T extends BaseEntity<ID>, ID>{
     final Scanner sc = new Scanner(System.in);
-    private static CrudService service;
+    private static CrudController service;
     @SneakyThrows
-    public static synchronized CrudService getInstance() {
+    public static synchronized CrudController getInstance() {
         if (service == null) {
-            service = new CrudService();
+            service = new CrudController();
         }
         return service;
     }
