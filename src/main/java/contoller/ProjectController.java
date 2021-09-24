@@ -1,21 +1,21 @@
-package service;
+package contoller;
 
 import lombok.SneakyThrows;
 import model.Project;
 
-public class ProjectService extends BaseService<Project,Long>{
-    private static ProjectService service;
+public class ProjectController extends BaseController<Project,Long> {
+    private static ProjectController service;
 
     @SneakyThrows
-    public static synchronized ProjectService getInstance() {
+    public static synchronized ProjectController getInstance() {
         if (service == null) {
-            service = new ProjectService();
+            service = new ProjectController();
         }
         return service;
     }
 
     @Override
-    public Project init(){
+    public Project makeModel(){
         Project project = new Project();
         System.out.println("Введите ID");
         project.setId(checkLong());

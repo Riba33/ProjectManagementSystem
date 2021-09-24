@@ -1,20 +1,20 @@
-package service;
+package contoller;
 
 import lombok.SneakyThrows;
 import model.Customer;
 
-public class CustomerService extends BaseService<Customer, Long> {
-    private static CustomerService service;
+public class CustomerController extends BaseController<Customer, Long> {
+    private static CustomerController service;
 
     @SneakyThrows
-    public static synchronized CustomerService getInstance() {
+    public static synchronized CustomerController getInstance() {
         if (service == null) {
-            service = new CustomerService();
+            service = new CustomerController();
         }
         return service;
     }
     @Override
-    public Customer init() {
+    public Customer makeModel() {
         Customer customer = new Customer();
         System.out.println("Введите ID");
         customer.setId(checkLong());

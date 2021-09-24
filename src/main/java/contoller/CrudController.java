@@ -4,13 +4,14 @@ import lombok.SneakyThrows;
 import model.*;
 import repository.CrudRepository;
 import repository.RepositoryFactory;
-import service.*;
+import service.TableService;
 
 import java.util.Scanner;
 
 public class CrudController<T extends BaseEntity<ID>, ID>{
     final Scanner sc = new Scanner(System.in);
     private static CrudController service;
+    private TableService tableService = TableService.getInstance();
     @SneakyThrows
     public static synchronized CrudController getInstance() {
         if (service == null) {
@@ -20,36 +21,16 @@ public class CrudController<T extends BaseEntity<ID>, ID>{
     }
 
     public void selectModel() {
-        String str = "Выберите номер таблицы?\n1 - Companies\n2 - Customers\n3 - Developers\n4 - Projects\n5 - Skills";
+        String str = "Выберите номер таблицы?\n1 - Companies\n2 - Customers\n3 - Developers\n4 - Projects\n5 - Skills\n" +
+                "0 - Вернутся в предыдущее меню";
         //System.out.println(str);
         int i =selectedIsInt(str);
 
-        switchTable(i);
+        tableService.switchTable(i);
     }
 
-    private void switchTable(int i) {
-        CrudRepository crudRepository;
-        switch (i) {
-            case 1: crudRepository = RepositoryFactory.of(Company.class);
-                    CompanyService.getInstance().selectCrudService(crudRepository);
-                    break;
-            case 2: crudRepository = RepositoryFactory.of(Customer.class);
-                    CustomerService.getInstance().selectCrudService(crudRepository);
-                    break;
-            case 3: crudRepository = RepositoryFactory.of(Developer.class);
-                    DeveloperService.getInstance().selectCrudService(crudRepository);
-                    break;
-            case 4: crudRepository = RepositoryFactory.of(Project.class);
-                    ProjectService.getInstance().selectCrudService(crudRepository);
-                    break;
-            case 5: crudRepository = RepositoryFactory.of(Skill.class);
-                    SkillService.getInstance().selectCrudService(crudRepository);
-                    break;
-            default: break;
-        }
-    }
     private Boolean selectIsGood(int i) {
-        if (i > 0 && i < 6) return true;
+        if (i >= 0 && i < 6) return true;
         System.out.println("Вводите номер таблицы из предложенных значений.");
         return false;
     }
@@ -58,7 +39,7 @@ public class CrudController<T extends BaseEntity<ID>, ID>{
         do {
             System.out.println(str);
             while (!sc.hasNextInt()){
-                System.out.println("Введите число от 1 до 5!");
+                System.out.println("Введите число от 0 до 5!");
                sc.next();
             }
             i = sc.nextInt();

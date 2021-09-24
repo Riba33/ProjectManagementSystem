@@ -11,9 +11,9 @@ public interface QueryRepository <T extends BaseEntity<ID>,ID>{
 
     List<T> getDevsByProID(Long projectId) throws SQLException;
 
-    List<T> listJava() throws SQLException;
+    List<T> listDevelopersOfSkill() throws SQLException;
 
-    List<T> listMiddle() throws SQLException;
+    List<T> listDevelopersOfLevelSkill() throws SQLException;
 
     List listProWithData() throws SQLException;
 }

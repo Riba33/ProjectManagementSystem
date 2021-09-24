@@ -1,15 +1,18 @@
-package service;
+package contoller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import model.*;
+import model.BaseEntity;
 import repository.CrudRepository;
+import service.CheckInputService;
 
 import java.util.Scanner;
 
-public abstract class BaseService<E extends BaseEntity<ID>, ID> {
+public abstract class BaseController <E extends BaseEntity<ID>, ID>{
+    final Console console = Console.getInstance();
     final Scanner sc = new Scanner(System.in);
     final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final CheckInputService check = CheckInputService.getInstance();
 
 
     public void selectCrudService(CrudRepository crudRepository) {
@@ -26,25 +29,31 @@ public abstract class BaseService<E extends BaseEntity<ID>, ID> {
         switch (i) {
             case 1:
                 System.out.println(gson.toJson(crudRepository.findALL()));
+                console.exitOrNot();
                 break;
             case 2:
-                System.out.println(gson.toJson(crudRepository.findById(selectId())));
+                Long id = checkId(crudRepository);
+                System.out.println(gson.toJson(crudRepository.findById(id)));
+                console.exitOrNot();
                 break;
             case 3:
-                Long id = selectId();
-                crudRepository.deleteById(id);
-                System.out.println("Запись по ID = " + id + " удалена!");
+                Long id1 = checkId(crudRepository);
+                crudRepository.deleteById(id1);
+                System.out.println("Запись по ID = " + id1 + " удалена!");
+                console.exitOrNot();
                 break;
             case 4:
-                System.out.println(crudRepository.save(init()));
+                BaseEntity model = makeModel();
+                System.out.println(crudRepository.save(model));
+                console.exitOrNot();
             default: break;
         }
     }
 
-    protected abstract BaseEntity init();
+    public abstract BaseEntity makeModel();
 
     Long selectId() {
-        Long i;
+        long i;
         System.out.println("Введите ID");
         while (!sc.hasNextLong()) {
             System.out.println("Вы ввели не число.");
@@ -53,12 +62,6 @@ public abstract class BaseService<E extends BaseEntity<ID>, ID> {
         i = sc.nextLong();
 
         return i;
-    }
-
-    private Boolean selectIsGood(int i) {
-        if (i > 0 && i < 5) return true;
-        System.out.println("Вводите номер таблицы из предложенных значений.");
-        return false;
     }
 
     private int selectedIsInt(String str) {
@@ -71,7 +74,7 @@ public abstract class BaseService<E extends BaseEntity<ID>, ID> {
             }
             i = sc.nextInt();
         }
-        while (!selectIsGood(i));
+        while (!check.selectIsGood(i));
         return i;
     }
 
@@ -100,27 +103,30 @@ public abstract class BaseService<E extends BaseEntity<ID>, ID> {
         do {
             System.out.println("Правильно укажите пол (M) - Мужской, (W) - Женский");
             gender = sc.next();
-        } while (!isGender(gender));
+        } while (!check.isGender(gender));
         return gender;
-    }
-
-    private boolean isGender(String s) {
-        if (s.equals("M") || s.equals("m") || s.equals("W") || s.equals("w")) return true;
-        return false;
     }
 
     String checkSkill() {
         String skill = "";
         do {
-            System.out.println("Правильно укажите пол (M) - Мужской, (W) - Женский");
+            System.out.println("Правильно укажите уровень из предложенных вариантов.");
             skill = sc.next();
-        } while (!isSkill(skill));
+        } while (!check.isSkill(skill));
         return skill;
     }
-
-    private boolean isSkill(String skill) {
-        String s = skill.toLowerCase();
-        if (s.equals("junior") || s.equals("middle") || s.equals("senior")) return true;
+    private boolean isIdExists(CrudRepository repository,Long id){
+        if(repository.findById(id).isPresent()) return true;
+        System.out.println("Нет записей по данному ID!\nПовторите ввод ID.");
         return false;
+    }
+    Long checkId(CrudRepository repository){
+        Long id;
+        do {
+            id = selectId();
+
+        }
+        while (!isIdExists(repository,id));
+        return id;
     }
 }

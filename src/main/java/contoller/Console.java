@@ -1,18 +1,12 @@
 package contoller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.SneakyThrows;
-import model.BaseEntity;
-import repository.QueryRepositoryImpl;
+import service.MenuService;
 
-import java.sql.SQLException;
 import java.util.Scanner;
 
-public class Console <T extends BaseEntity<ID>, ID>{
+public class Console {
 
-    final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    final QueryRepositoryImpl repo = QueryRepositoryImpl.getInstance();
     Scanner sc = new Scanner(System.in);
 
     private static Console console;
@@ -25,11 +19,11 @@ public class Console <T extends BaseEntity<ID>, ID>{
         return console;
     }
 
-    public void selectMenu() throws SQLException {
+    public void selectMenu() {
         String str = "1 - зарплата(сумма) всех разработчиков отдельного проекта.\n" +
                 "2 - список разработчиков отдельного проекта.\n" +
-                "3 - список всех Java разработчиков.\n" +
-                "4 - список всех middle разработчиков.\n" +
+                "3 - список всех Java/C#/C++/JS разработчиков(на выбор).\n" +
+                "4 - список всех junior/middle/senior разработчиков(на выбор).\n" +
                 "5 - список проектов в следующем формате: дата создания - название проекта - количество разработчиков на этом проекте.\n" +
                 "6 - использование CRUD сервисов для выбранных таблиц.\n" +
                 "0 - выйти из программы.\n" +
@@ -44,51 +38,20 @@ public class Console <T extends BaseEntity<ID>, ID>{
             i = sc.nextInt();
         }
 
-        while (!selectIsGood(i));
-        switchSelected(i);
+        while (!selectIsGood(i,6,0));
+        MenuService.getInstance().switchSelected(i);
 
     }
 
-    private Boolean selectIsGood(int i) {
-        if (i >= 0 && i <= 6) return true;
-        System.out.println("Вводите ответ из предложенных значений.");
-        return false;
-    }
-
-    @SneakyThrows
-    private void switchSelected(int i){
-        switch (i) {
-            case 1:
-                System.out.println(repo.getSumByProID(repo.selectProject()));
-                exitOrNot();
-                break;
-            case 2:
-                System.out.println(gson.toJson(repo.getDevsByProID(repo.selectProject())));
-                exitOrNot();
-                break;
-            case 3:
-                System.out.println(gson.toJson(repo.listJava()));
-                exitOrNot();
-                break;
-            case 4:
-                System.out.println(gson.toJson(repo.listMiddle()));
-                exitOrNot();
-                break;
-            case 5:
-                System.out.println(gson.toJson(repo.listProWithData()));
-                exitOrNot();
-                break;
-            case 6:
-                CrudController.getInstance().selectModel();
-                exitOrNot();
-                break;
-            default:
-                break;
+    private Boolean selectIsGood(int i, int max, int min) {
+        if (i >= min && i <= max) return true;
+        else {
+            return false;
         }
     }
 
     @SneakyThrows
-    private void exitOrNot(){
+    public void exitOrNot(){
         int i;
         do {
             System.out.println("Желаете ли вернутся к выбору задачи? 1 - Да!, 0 - Завершит работу!");
@@ -111,5 +74,60 @@ public class Console <T extends BaseEntity<ID>, ID>{
         }
         return true;
     }
-
+    public String selectLevelDeveloper() {
+        int i;
+        String level = "";
+        do {
+            System.out.println("Введите уровень владения языка программироания.\n 1 - Junior, 2 - Middle, 3 - Senior ?");
+            while (!sc.hasNextInt()) {
+                System.out.println("Вводите число от 1 до 3!");
+                sc.next();
+            }
+            i = sc.nextInt();
+        }
+        while (!selectIsGood(i, 3, 1));
+        switch (i) {
+            case 1:
+                level = "Junior";
+                break;
+            case 2:
+                level = "Middle";
+                break;
+            case 3:
+                level = "Senior";
+            default:
+                break;
+        }
+        return level;
+    }
+    public String selectSkillDeveloper() {
+        int i;
+        String skill = "";
+        do {
+            System.out.println("Введите названия языка программироания.\n 1 - Java, 2 - C++, 3 - C#, 4 - JS ?");
+            while (!sc.hasNextInt()) {
+                System.out.println("Вводите число от 1 до 4!");
+                sc.next();
+            }
+            i = sc.nextInt();
+        }
+        while (!selectIsGood(i, 4, 1));
+        switch (i) {
+            case 1:
+                skill = "Java";
+                break;
+            case 2:
+                skill = "C++";
+                break;
+            case 3:
+                skill = "C#";
+                break;
+            case 4:
+                skill = "JS";
+                break;
+            default:
+                break;
+        }
+        return skill;
+    }
 }

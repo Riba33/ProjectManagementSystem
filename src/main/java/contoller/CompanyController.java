@@ -1,19 +1,19 @@
-package service;
+package contoller;
 
 import lombok.SneakyThrows;
 import model.Company;
 
-public class CompanyService extends BaseService<Company,Long>{
-    private static CompanyService service;
+public class CompanyController extends BaseController<Company,Long> {
+    private static CompanyController service;
     @SneakyThrows
-    public static synchronized CompanyService getInstance() {
+    public static synchronized CompanyController getInstance() {
         if (service == null) {
-            service = new CompanyService();
+            service = new CompanyController();
         }
         return service;
     }
     @Override
-    public Company init(){
+    public Company makeModel(){
         Company company = new Company();
         System.out.println("Введите ID");
         company.setId(checkLong());

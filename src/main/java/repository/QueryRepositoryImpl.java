@@ -1,5 +1,6 @@
 package repository;
 
+import contoller.Console;
 import lombok.SneakyThrows;
 import model.Developer;
 import model.DevelopersInProject;
@@ -16,6 +17,7 @@ public class QueryRepositoryImpl implements QueryRepository {
 
     private Connection connection;
     private static QueryRepositoryImpl queryRepository;
+    private Console console = Console.getInstance();
 
     @SneakyThrows
     public QueryRepositoryImpl() {
@@ -64,7 +66,7 @@ public class QueryRepositoryImpl implements QueryRepository {
     }
 
     @Override
-    public List listJava() throws SQLException {
+    public List listDevelopersOfSkill() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT developers.id, developers.name, " +
                 "developers.surname, developers.age, developers.gender, developers.salary " +
                 "FROM developers " +
@@ -72,12 +74,15 @@ public class QueryRepositoryImpl implements QueryRepository {
                 " ON developers.id = developers_skils.developers_id " +
                 " INNER JOIN skils " +
                 " ON developers_skils.skils_id = skils.id " +
-                " WHERE skils.name='Java';");
-        return parseDevelopers(preparedStatement.executeQuery());
+                " WHERE skils.name= ?;");
+        String st = console.selectSkillDeveloper();
+        preparedStatement.setString(1,st);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        return parseDevelopers(resultSet);
     }
 
     @Override
-    public List listMiddle() throws SQLException {
+    public List listDevelopersOfLevelSkill() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT developers.id, developers.name, developers.surname,\n" +
                 " developers.age, developers.gender, developers.salary " +
                 "FROM developers " +
@@ -85,9 +90,12 @@ public class QueryRepositoryImpl implements QueryRepository {
                 " ON developers.id = developers_skils.developers_id " +
                 " INNER JOIN skils " +
                 " ON developers_skils.skils_id = skils.id " +
-                "   WHERE skils.level='Middle' " +
+                "   WHERE skils.level = ? " +
                 "    ORDER BY id;");
-        return parseDevelopers(preparedStatement.executeQuery());
+        String st = console.selectLevelDeveloper();
+        preparedStatement.setString(1,st);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        return parseDevelopers(resultSet);
     }
 
     @Override

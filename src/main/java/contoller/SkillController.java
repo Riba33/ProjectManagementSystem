@@ -1,21 +1,21 @@
-package service;
+package contoller;
 
 import lombok.SneakyThrows;
 import model.Skill;
 
-public class SkillService extends BaseService<Skill,Long>{
-    private static SkillService service;
+public class SkillController extends BaseController<Skill,Long> {
+    private static SkillController service;
 
     @SneakyThrows
-    public static synchronized SkillService getInstance() {
+    public static synchronized SkillController getInstance() {
         if (service == null) {
-            service = new SkillService();
+            service = new SkillController();
         }
         return service;
     }
 
     @Override
-    public Skill init(){
+    public Skill makeModel(){
         Skill skill = new Skill();
         System.out.println("Введите ID");
         skill.setId(checkLong());

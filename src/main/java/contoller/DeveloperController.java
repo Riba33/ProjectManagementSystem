@@ -1,21 +1,21 @@
-package service;
+package contoller;
 
 import lombok.SneakyThrows;
 import model.Developer;
 
-public class DeveloperService extends BaseService<Developer,Long>{
-    private static DeveloperService service;
+public class DeveloperController extends BaseController<Developer,Long> {
+    private static DeveloperController service;
 
     @SneakyThrows
-    public static synchronized DeveloperService getInstance() {
+    public static synchronized DeveloperController getInstance() {
         if (service == null) {
-            service = new DeveloperService();
+            service = new DeveloperController();
         }
         return service;
     }
 
     @Override
-    public Developer init() {
+    public Developer makeModel() {
         Developer developer = new Developer();
         System.out.println("Введите ID");
         developer.setId(checkLong());
