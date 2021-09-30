@@ -1,23 +1,21 @@
 package repository;
 
-import contoller.Console;
 import lombok.SneakyThrows;
 import model.Developer;
-import model.DevelopersInProject;
-import model.Project;
+import model.ProjectWithCountDevelopers;
 import utils.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QueryRepositoryImpl implements QueryRepository {
 
     private Connection connection;
     private static QueryRepositoryImpl queryRepository;
-    private Console console = Console.getInstance();
 
     @SneakyThrows
     public QueryRepositoryImpl() {
@@ -33,7 +31,7 @@ public class QueryRepositoryImpl implements QueryRepository {
     }
 
     @Override
-    public Long getSumByProID(Long projectId) throws SQLException {
+    public Long getSumSalaryByProject(Long projectId) throws SQLException {
 
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT sum(salary) as cost, " +
                 " projects.name as projectName " +
@@ -52,7 +50,7 @@ public class QueryRepositoryImpl implements QueryRepository {
     }
 
     @Override
-    public List getDevsByProID(Long projectId) throws SQLException {
+    public List getDevelopersByProject(Long projectId) throws SQLException {
 
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * " +
                 "FROM developers " +
@@ -66,7 +64,8 @@ public class QueryRepositoryImpl implements QueryRepository {
     }
 
     @Override
-    public List listDevelopersOfSkill() throws SQLException {
+    @SneakyThrows
+    public List listDevelopersOfSkill(String skill){
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT developers.id, developers.name, " +
                 "developers.surname, developers.age, developers.gender, developers.salary " +
                 "FROM developers " +
@@ -75,14 +74,14 @@ public class QueryRepositoryImpl implements QueryRepository {
                 " INNER JOIN skils " +
                 " ON developers_skils.skils_id = skils.id " +
                 " WHERE skils.name= ?;");
-        String st = console.selectSkillDeveloper();
-        preparedStatement.setString(1,st);
+        preparedStatement.setString(1,skill);
         ResultSet resultSet = preparedStatement.executeQuery();
         return parseDevelopers(resultSet);
     }
 
     @Override
-    public List listDevelopersOfLevelSkill() throws SQLException {
+    @SneakyThrows
+    public List listDevelopersOfLevelSkill(String level) {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT developers.id, developers.name, developers.surname,\n" +
                 " developers.age, developers.gender, developers.salary " +
                 "FROM developers " +
@@ -92,14 +91,14 @@ public class QueryRepositoryImpl implements QueryRepository {
                 " ON developers_skils.skils_id = skils.id " +
                 "   WHERE skils.level = ? " +
                 "    ORDER BY id;");
-        String st = console.selectLevelDeveloper();
-        preparedStatement.setString(1,st);
+        preparedStatement.setString(1,level);
         ResultSet resultSet = preparedStatement.executeQuery();
         return parseDevelopers(resultSet);
     }
 
     @Override
-    public List<DevelopersInProject> listProWithData() throws SQLException {
+    @SneakyThrows
+    public List<ProjectWithCountDevelopers> listProjectWithCountDevelopers() {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT projects.name, projects.date," +
                 " count(projects.name) Developers " +
                 "FROM projects " +
@@ -109,9 +108,9 @@ public class QueryRepositoryImpl implements QueryRepository {
                 " ON developers_projects.developers_id = developers.id " +
                 "GROUP BY name;");
         final ResultSet resultSet = preparedStatement.executeQuery();
-        List<DevelopersInProject> list = new ArrayList<>();
+        List<ProjectWithCountDevelopers> list = new ArrayList<>();
         while(resultSet.next()) {
-            DevelopersInProject devInProject = DevelopersInProject.builder()
+            ProjectWithCountDevelopers devInProject = ProjectWithCountDevelopers.builder()
                     .name(resultSet.getString("name"))
                     .date(resultSet.getDate("date"))
                     .countDevelopers(resultSet.getLong("Developers"))
@@ -121,32 +120,7 @@ public class QueryRepositoryImpl implements QueryRepository {
 
         return list;
     }
-    public Long selectProject() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM projects;");
-        final ResultSet resultSet = preparedStatement.executeQuery();
-        List<Project> list = new ArrayList<>();
-        while(resultSet.next()) {
-            Project project = Project.builder()
-                    .id(resultSet.getLong("id"))
-                    .name(resultSet.getString("name"))
-                    .date(resultSet.getDate("date"))
-                    .build();
-            list.add(project);
-        }
-        Scanner sc = new Scanner(System.in);
-        System.out.println(list);
-        Long i = 0L;
-        do {
-            System.out.println("Выбирите проект указав его ID от 1 до "+ list.size() + "!");
-            while (!sc.hasNextInt()){
-                System.out.println("Введите число от 0 до " + list.size() + "!");
-                sc.next();
-            }
-            i = sc.nextLong();
-        } while (!isGood(i,list.size()));
-        return i;
 
-    }
     private List<Developer> parseDevelopers(ResultSet resultSet) throws SQLException {
         List<Developer> developers = new ArrayList<>();
         while(resultSet.next()) {
@@ -161,10 +135,5 @@ public class QueryRepositoryImpl implements QueryRepository {
             developers.add(developer);
         }
         return developers;
-    }
-
-    private boolean isGood(Long i, int size) {
-        if (i > 0 && i <= size) return true;
-        return false;
     }
 }

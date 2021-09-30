@@ -15,7 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class DevelopersInProject implements Serializable {
+public class ProjectWithCountDevelopers implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -5463429505486781133L;

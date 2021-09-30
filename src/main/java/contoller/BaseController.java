@@ -3,48 +3,46 @@ package contoller;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.BaseEntity;
-import repository.CrudRepository;
-import service.CheckInputService;
+import service.BaseService;
 
 import java.util.Scanner;
 
-public abstract class BaseController <E extends BaseEntity<ID>, ID>{
+public abstract class BaseController {
     final Console console = Console.getInstance();
     final Scanner sc = new Scanner(System.in);
     final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final CheckInputService check = CheckInputService.getInstance();
 
 
-    public void selectCrudService(CrudRepository crudRepository) {
+    public void selectCrudService(BaseService baseService) {
         String str = "Выберите действие над выбранной таблицой\n" +
                 "1 - Вывести всю таблицу.\n2 - Найти элемент в таблице по ID\n" +
                 "3 - Удалить елмент в табли6це по ID\n" +
                 "4 - Записать/обновить(если уже такой ID существует) елемент в таблицу.";
         int i = selectedIsInt(str);
-        switchCrudService(i, crudRepository);
+        switchCrudService(i, baseService);
 
     }
 
-    void switchCrudService(int i, CrudRepository crudRepository) {
+    void switchCrudService(int i, BaseService baseService) {
         switch (i) {
             case 1:
-                System.out.println(gson.toJson(crudRepository.findALL()));
+                System.out.println(gson.toJson(baseService.findALL()));
                 console.exitOrNot();
                 break;
             case 2:
-                Long id = checkId(crudRepository);
-                System.out.println(gson.toJson(crudRepository.findById(id)));
+                Long id = checkId(baseService);
+                System.out.println(gson.toJson(baseService.findById(id)));
                 console.exitOrNot();
                 break;
             case 3:
-                Long id1 = checkId(crudRepository);
-                crudRepository.deleteById(id1);
+                Long id1 = checkId(baseService);
+                baseService.deleteById(id1);
                 System.out.println("Запись по ID = " + id1 + " удалена!");
                 console.exitOrNot();
                 break;
             case 4:
                 BaseEntity model = makeModel();
-                System.out.println(crudRepository.save(model));
+                System.out.println(baseService.save(model));
                 console.exitOrNot();
             default: break;
         }
@@ -74,7 +72,7 @@ public abstract class BaseController <E extends BaseEntity<ID>, ID>{
             }
             i = sc.nextInt();
         }
-        while (!check.selectIsGood(i));
+        while (!selectIsGood(i));
         return i;
     }
 
@@ -103,7 +101,7 @@ public abstract class BaseController <E extends BaseEntity<ID>, ID>{
         do {
             System.out.println("Правильно укажите пол (M) - Мужской, (W) - Женский");
             gender = sc.next();
-        } while (!check.isGender(gender));
+        } while (!isGender(gender));
         return gender;
     }
 
@@ -112,21 +110,35 @@ public abstract class BaseController <E extends BaseEntity<ID>, ID>{
         do {
             System.out.println("Правильно укажите уровень из предложенных вариантов.");
             skill = sc.next();
-        } while (!check.isSkill(skill));
+        } while (!isSkill(skill));
         return skill;
     }
-    private boolean isIdExists(CrudRepository repository,Long id){
-        if(repository.findById(id).isPresent()) return true;
+    private boolean isIdExists(BaseService service,Long id){
+        if(service.findById(id).isPresent()) return true;
         System.out.println("Нет записей по данному ID!\nПовторите ввод ID.");
         return false;
     }
-    Long checkId(CrudRepository repository){
+    Long checkId(BaseService baseService){
         Long id;
         do {
             id = selectId();
 
         }
-        while (!isIdExists(repository,id));
+        while (!isIdExists(baseService,id));
         return id;
+    }
+    private Boolean selectIsGood(int i) {
+        if (i >= 0 && i < 5) return true;
+        System.out.println("Вводите номер таблицы из предложенных значений.");
+        return false;
+    }
+    private boolean isGender(String s) {
+        if (s.equals("M") || s.equals("m") || s.equals("W") || s.equals("w")) return true;
+        return false;
+    }
+    private boolean isSkill(String skill) {
+        String s = skill.toLowerCase();
+        if (s.equals("junior") || s.equals("middle") || s.equals("senior")) return true;
+        return false;
     }
 }

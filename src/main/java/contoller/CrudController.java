@@ -2,16 +2,15 @@ package contoller;
 
 import lombok.SneakyThrows;
 import model.*;
-import repository.CrudRepository;
-import repository.RepositoryFactory;
-import service.TableService;
+import service.BaseService;
+import service.ServiceFactory;
 
 import java.util.Scanner;
 
 public class CrudController<T extends BaseEntity<ID>, ID>{
     final Scanner sc = new Scanner(System.in);
+
     private static CrudController service;
-    private TableService tableService = TableService.getInstance();
     @SneakyThrows
     public static synchronized CrudController getInstance() {
         if (service == null) {
@@ -26,7 +25,30 @@ public class CrudController<T extends BaseEntity<ID>, ID>{
         //System.out.println(str);
         int i =selectedIsInt(str);
 
-        tableService.switchTable(i);
+        switchTable(i);
+    }
+    private void switchTable(int i) {
+        BaseService baseService;
+        switch (i) {
+            case 1: baseService = ServiceFactory.of(Company.class);
+                CompanyController.getInstance().selectCrudService(baseService);
+                break;
+            case 2: baseService = ServiceFactory.of(Customer.class);
+                CustomerController.getInstance().selectCrudService(baseService);
+                break;
+            case 3: baseService = ServiceFactory.of(Developer.class);
+                DeveloperController.getInstance().selectCrudService(baseService);
+                break;
+            case 4: baseService = ServiceFactory.of(Project.class);
+                ProjectController.getInstance().selectCrudService(baseService);
+                break;
+            case 5: baseService = ServiceFactory.of(Skill.class);
+                SkillController.getInstance().selectCrudService(baseService);
+                break;
+            case 0: Console.getInstance().selectMenu();
+                break;
+            default: break;
+        }
     }
 
     private Boolean selectIsGood(int i) {

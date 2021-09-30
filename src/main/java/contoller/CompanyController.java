@@ -3,7 +3,7 @@ package contoller;
 import lombok.SneakyThrows;
 import model.Company;
 
-public class CompanyController extends BaseController<Company,Long> {
+public class CompanyController extends BaseController {
     private static CompanyController service;
     @SneakyThrows
     public static synchronized CompanyController getInstance() {

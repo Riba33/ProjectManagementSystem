@@ -1,13 +1,19 @@
 package contoller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.SneakyThrows;
-import service.MenuService;
+import model.Project;
+import service.QueryService;
+import service.ServiceFactory;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Console {
-
-    Scanner sc = new Scanner(System.in);
+    private QueryService service = QueryService.getInstance();
+    private final Scanner sc = new Scanner(System.in);
+    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private static Console console;
 
@@ -18,8 +24,8 @@ public class Console {
         }
         return console;
     }
-
-    public void selectMenu() {
+    @SneakyThrows
+    public void selectMenu(){
         String str = "1 - зарплата(сумма) всех разработчиков отдельного проекта.\n" +
                 "2 - список разработчиков отдельного проекта.\n" +
                 "3 - список всех Java/C#/C++/JS разработчиков(на выбор).\n" +
@@ -39,7 +45,7 @@ public class Console {
         }
 
         while (!selectIsGood(i,6,0));
-        MenuService.getInstance().switchSelected(i);
+        switchSelected(i);
 
     }
 
@@ -49,7 +55,42 @@ public class Console {
             return false;
         }
     }
-
+    @SneakyThrows
+    private void switchSelected(int i){
+        switch (i) {
+            case 1:
+                Long id = selectProject();
+                System.out.println(service.getSumSalaryByProject(id));
+                exitOrNot();
+                break;
+            case 2:
+                Long id1 = selectProject();
+                List developers = service.getDevelopersByProject(id1);
+                String json = gson.toJson(developers);
+                System.out.println(json);
+                exitOrNot();
+                break;
+            case 3:
+                String skill = selectSkillDeveloper();
+                System.out.println(gson.toJson(service.listDevelopersOfSkill(skill)));
+                exitOrNot();
+                break;
+            case 4:
+                String level = selectLevelDeveloper();
+                System.out.println(gson.toJson(service.listDevelopersOfLevelSkill(level)));
+                exitOrNot();
+                break;
+            case 5:
+                System.out.println(gson.toJson(service.listProjectsWithCountOfDevelopers()));
+                exitOrNot();
+                break;
+            case 6:
+                CrudController.getInstance().selectModel();
+                break;
+            default:
+                break;
+        }
+    }
     @SneakyThrows
     public void exitOrNot(){
         int i;
@@ -62,9 +103,8 @@ public class Console {
             i = sc.nextInt();
         }
         while (!isOneOrZero(i));
-        switch (i){
-            case 1: Console.getInstance().selectMenu();
-            default: break;
+        if (i == 1) {
+            Console.getInstance().selectMenu();
         }
     }
     private boolean isOneOrZero (int i) {
@@ -74,7 +114,25 @@ public class Console {
         }
         return true;
     }
-    public String selectLevelDeveloper() {
+    public Long selectProject() {
+        List<Project> list = ServiceFactory.of(Project.class).findALL();
+        System.out.println(list);
+        long i = 0L;
+        do {
+            System.out.println("Выбирите проект указав его ID от 1 до "+ list.size() + "!");
+            while (!sc.hasNextInt()){
+                System.out.println("Введите число от 1 до " + list.size() + "!");
+                sc.next();
+            }
+            i = sc.nextLong();
+        } while (!isGood(i,list.size()));
+        return i;
+    }
+    private boolean isGood(Long i, int size) {
+        if (i > 0 && i <= size) return true;
+        return false;
+    }
+    private String selectLevelDeveloper() {
         int i;
         String level = "";
         do {

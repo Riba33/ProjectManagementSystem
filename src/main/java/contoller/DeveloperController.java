@@ -3,7 +3,7 @@ package contoller;
 import lombok.SneakyThrows;
 import model.Developer;
 
-public class DeveloperController extends BaseController<Developer,Long> {
+public class DeveloperController extends BaseController {
     private static DeveloperController service;
 
     @SneakyThrows
