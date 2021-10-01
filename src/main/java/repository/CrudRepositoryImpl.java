@@ -138,7 +138,7 @@ class CrudRepositoryImpl<T extends BaseEntity<ID>, ID> implements Closeable, Cru
         statement.executeUpdate();
         ResultSet rs = statement.getGeneratedKeys();
         rs.next();
-        return findById((ID)rs.getObject(1)).get();
+        return findById(t.getId()).get();
     }
 
     @SneakyThrows
