@@ -28,7 +28,7 @@ public class DeveloperController extends BaseController {
         System.out.println("Укажите пол разработчика. (M) - Мужской, (W) - Женский");
         developer.setGender(checkGender());
         System.out.println("Укажите зарпдату разработчика.");
-        developer.setAge(checkInt());
+        developer.setSalary(checkInt());
 
         return developer;
     }
